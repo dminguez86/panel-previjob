@@ -59,9 +59,39 @@ header p{margin:.35rem 0 0;color:#c8d0d6;font-size:.95rem}
 main{
   flex:1;
   width:100%;
-  max-width:640px;
+  max-width:800px;
   margin:0 auto;
   padding:2rem 1.25rem 1.5rem;
+}
+.nav{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:center;
+  gap:.7rem 1rem;
+  margin:0 0 1.4rem;
+}
+.nav[hidden]{display:none}
+.back{
+  font:inherit;
+  font-weight:700;
+  font-size:.95rem;
+  color:#fff;
+  background:var(--dark);
+  border:0;
+  border-radius:999px;
+  padding:.45rem 1rem;
+  cursor:pointer;
+  text-decoration:none;
+  line-height:1.2;
+}
+.back:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}
+.nav h2{
+  margin:0;
+  font-size:1.15rem;
+  font-weight:700;
+  color:var(--dark);
+  text-align:center;
 }
 .grid{
   display:grid;
@@ -70,8 +100,9 @@ main{
   gap:1.6rem 1.25rem;
   width:100%;
 }
-@media (min-width:560px){
-  .grid{grid-template-columns:repeat(3, minmax(0, 180px))}
+@media (min-width:720px){
+  .grid{grid-template-columns:repeat(4, minmax(0, 180px))}
+  .grid.centered{grid-template-columns:repeat(auto-fit, minmax(160px, 180px))}
 }
 .tile{
   display:flex;
@@ -79,6 +110,11 @@ main{
   align-items:center;
   text-decoration:none;
   color:inherit;
+  background:none;
+  border:0;
+  font:inherit;
+  padding:0;
+  cursor:pointer;
   -webkit-tap-highlight-color:transparent;
 }
 .icon{
@@ -105,6 +141,14 @@ main{
   color:var(--dark);
   max-width:11.5rem;
 }
+.tile.soon{cursor:default;opacity:.75}
+.tile.soon:hover .icon,.tile.soon:active .icon{transform:none;box-shadow:0 10px 24px rgba(13,13,13,.18)}
+.soon-tag{
+  margin-top:.25rem;
+  font-size:.8rem;
+  font-weight:600;
+  color:var(--g500);
+}
 footer{
   padding:0 1.25rem calc(1.4rem + env(safe-area-inset-bottom));
   text-align:center;
@@ -128,21 +172,27 @@ footer{
 <header>
   <img src="/logo-previjob.png" width="265" height="100" alt="PREVIJOB, Servicio de Prevención" />
   <h1>Panel PREVIJOB</h1>
-  <p>Elige una herramienta para abrirla</p>
+  <p id="subtitle">Elige una herramienta para abrirla</p>
 </header>
 <main>
+  <div class="nav" id="nav" hidden>
+    <a class="back" id="back" href="#">Volver</a>
+    <h2 id="folder-title"></h2>
+  </div>
   <div class="grid" id="grid"></div>
 </main>
 <footer>
   El panel de administración de cursos pide la contraseña de acceso. Si el servidor llevaba un rato parado, la primera carga puede tardar unos 15 segundos.
 </footer>
 <script>
-/* ── Cómo añadir una herramienta ──
- * 1. Añade un objeto al array TOOLS (id, name, href, icon, color).
- * 2. El campo icon debe coincidir con una clave de ICONS.
- *    Iconos disponibles: "formacion" (birrete), "documento" y "bombilla".
- * 3. Si necesitas un icono nuevo, añade su SVG en ICONS con la misma clave.
- * 4. git add -A && git commit && git push  — Render actualiza la web solo.
+/* ── Cómo añadir una herramienta o una carpeta ──
+ * Enlace:  { id, name, href, icon, color }
+ * Carpeta: { id, name, icon, color, items: [ ...enlaces o carpetas ] }
+ * Sin enlace todavía: { id, name, icon, color }  (se muestra como «Próximamente»)
+ * Las carpetas se abren en #id (o #padre/hija si hay varios niveles).
+ * El campo icon debe coincidir con una clave de ICONS.
+ * Iconos: "formacion", "documento", "bombilla", "tecnicos", "ruido".
+ * git add -A && git commit && git push  — Render actualiza la web solo.
  * No incluyas contraseñas.
  */
 const TOOLS = [
@@ -166,23 +216,81 @@ const TOOLS = [
     href: "https://previjob-luxometria.d-rodriguez.chatgpt.site/",
     icon: "bombilla",
     color: "linear-gradient(160deg,#b45309,#f5c542)"
+  },
+  {
+    id: "cursos-internos",
+    name: "Cursos internos técnicos",
+    icon: "tecnicos",
+    color: "linear-gradient(160deg,#1e3a4c,#0f7b6c)",
+    items: [
+      {
+        id: "ruido",
+        name: "Curso de ruido",
+        href: "https://curso-ruido-prl.onrender.com",
+        icon: "ruido",
+        color: "linear-gradient(160deg,#0f7b6c,#14b8a6)"
+      }
+    ]
   }
 ];
 
 const ICONS = {
   formacion: '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 8.5 4 22.5l28 14 24-12v14.2h4V22.5L32 8.5z"/><path d="M16 29.2v11.4c0 .6.4 1.4 1.5 2.2 2.4 1.8 7.6 4.2 14.5 4.2s12.1-2.4 14.5-4.2c1.1-.8 1.5-1.6 1.5-2.2V29.2L32 40.2 16 29.2z"/><path d="M52 26.8v18.2c2.4 1 4 3.6 4 5.5 0 2.4-2.2 3.5-4.6 3.5s-4.6-1.1-4.6-3.5c0-1.9 1.6-4.5 4-5.5V28.8l1.2-.6z"/></svg>',
   documento: '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M14 8h22l14 14v34a6 6 0 0 1-6 6H14a6 6 0 0 1-6-6V14a6 6 0 0 1 6-6z"/><path fill="#d7dde0" d="M36 8v14h14L36 8z"/><path d="M20 34h24M20 42h24M20 50h14" fill="none" stroke="#1a1d23" stroke-width="3.2" stroke-linecap="round" opacity=".4"/></svg>',
-  bombilla: '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4c-10.5 0-19 8.4-19 18.7 0 6.8 3.7 12.8 9.2 16.1V43h19.6v-4.2c5.5-3.3 9.2-9.3 9.2-16.1C51 12.4 42.5 4 32 4z"/><path d="M28 28.5c0-2.6 1.9-4.6 4-4.6s4 2 4 4.6" fill="none" stroke="#8a3d08" stroke-width="2.4" stroke-linecap="round"/><path d="M26.5 34.2c3.5-3.2 7.5-3.2 11 0" fill="none" stroke="#8a3d08" stroke-width="2.4" stroke-linecap="round"/><path d="M32 24v6.5" fill="none" stroke="#8a3d08" stroke-width="2.4" stroke-linecap="round"/><rect x="23.2" y="43" width="17.6" height="3.3" rx="1"/><rect x="23.2" y="47.2" width="17.6" height="3.3" rx="1"/><path d="M25.6 51.4h12.8l-1.7 5.4H27.3z"/></svg>'
+  bombilla: '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4c-10.5 0-19 8.4-19 18.7 0 6.8 3.7 12.8 9.2 16.1V43h19.6v-4.2c5.5-3.3 9.2-9.3 9.2-16.1C51 12.4 42.5 4 32 4z"/><path d="M28 28.5c0-2.6 1.9-4.6 4-4.6s4 2 4 4.6" fill="none" stroke="#8a3d08" stroke-width="2.4" stroke-linecap="round"/><path d="M26.5 34.2c3.5-3.2 7.5-3.2 11 0" fill="none" stroke="#8a3d08" stroke-width="2.4" stroke-linecap="round"/><path d="M32 24v6.5" fill="none" stroke="#8a3d08" stroke-width="2.4" stroke-linecap="round"/><rect x="23.2" y="43" width="17.6" height="3.3" rx="1"/><rect x="23.2" y="47.2" width="17.6" height="3.3" rx="1"/><path d="M25.6 51.4h12.8l-1.7 5.4H27.3z"/></svg>',
+  tecnicos: '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M22 22V16.5A6.5 6.5 0 0 1 28.5 10h7A6.5 6.5 0 0 1 42 16.5V22" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/><path d="M8 26h48v26a6 6 0 0 1-6 6H14a6 6 0 0 1-6-6V26z"/><path d="M8 36h48" fill="none" stroke="#1e3a4c" stroke-width="3"/><rect x="28" y="31.5" width="8" height="9" rx="1.6"/></svg>',
+  ruido: '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M6 24h11l16-11v38L17 40H6a4 4 0 0 1-4-4v-8a4 4 0 0 1 4-4z"/><path d="M41 22c5.2 5 5.2 15 0 20" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round"/><path d="M49 16c8.4 8 8.4 24 0 32" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round"/></svg>'
 };
 
 const grid = document.getElementById("grid");
-for (const tool of TOOLS) {
-  const a = document.createElement("a");
-  a.className = "tile";
-  a.href = tool.href;
-  a.target = "_blank";
-  a.rel = "noopener noreferrer";
-  a.setAttribute("aria-label", "Abrir " + tool.name);
+const nav = document.getElementById("nav");
+const back = document.getElementById("back");
+const folderTitle = document.getElementById("folder-title");
+const subtitle = document.getElementById("subtitle");
+
+function pathIds() {
+  return location.hash.replace(/^#\/?/, "").split("/").filter(Boolean);
+}
+
+function resolve(ids) {
+  let list = TOOLS;
+  const stack = [];
+  for (const id of ids) {
+    const found = list.find((t) => t.id === id);
+    if (!found || !Array.isArray(found.items)) {
+      return { list: TOOLS, stack: [] };
+    }
+    stack.push(found);
+    list = found.items;
+  }
+  return { list, stack };
+}
+
+function hashFor(stack, id) {
+  return "#" + [...stack.map((n) => n.id), id].join("/");
+}
+
+function parentHash(stack) {
+  if (stack.length <= 1) return "#";
+  return "#" + stack.slice(0, -1).map((n) => n.id).join("/");
+}
+
+function makeTile(tool, stack) {
+  const isFolder = Array.isArray(tool.items);
+  const isLink = Boolean(tool.href);
+  const el = document.createElement(isLink || isFolder ? "a" : "span");
+  el.className = "tile" + (!isLink && !isFolder ? " soon" : "");
+  if (isLink) {
+    el.href = tool.href;
+    el.target = "_blank";
+    el.rel = "noopener noreferrer";
+    el.setAttribute("aria-label", "Abrir " + tool.name);
+  } else if (isFolder) {
+    el.href = hashFor(stack, tool.id);
+    el.setAttribute("aria-label", "Abrir " + tool.name);
+  } else {
+    el.setAttribute("aria-label", tool.name + ", próximamente");
+  }
   const icon = document.createElement("span");
   icon.className = "icon";
   icon.style.background = tool.color;
@@ -190,9 +298,38 @@ for (const tool of TOOLS) {
   const label = document.createElement("span");
   label.className = "label";
   label.textContent = tool.name;
-  a.append(icon, label);
-  grid.append(a);
+  el.append(icon, label);
+  if (!isLink && !isFolder) {
+    const tag = document.createElement("span");
+    tag.className = "soon-tag";
+    tag.textContent = "Próximamente";
+    el.append(tag);
+  }
+  return el;
 }
+
+function render() {
+  const { list, stack } = resolve(pathIds());
+  grid.replaceChildren(...list.map((tool) => makeTile(tool, stack)));
+  grid.classList.toggle("centered", list.length <= 2);
+  if (stack.length) {
+    const current = stack[stack.length - 1];
+    nav.hidden = false;
+    folderTitle.textContent = current.name;
+    back.href = parentHash(stack);
+    subtitle.textContent = "Elige un curso para abrirlo";
+    document.title = current.name + " · Panel PREVIJOB";
+  } else {
+    nav.hidden = true;
+    folderTitle.textContent = "";
+    back.href = "#";
+    subtitle.textContent = "Elige una herramienta para abrirla";
+    document.title = "Panel PREVIJOB";
+  }
+}
+
+window.addEventListener("hashchange", render);
+render();
 </script>
 </body>
 </html>
