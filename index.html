@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0d0d0d" />
+<meta name="robots" content="noindex,nofollow" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="Panel PREVIJOB" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="description" content="Acceso rápido a las herramientas de PREVIJOB" />
+<title>Panel PREVIJOB</title>
+<link rel="manifest" href="/manifest.json" />
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<style>
+:root{
+  --cyan:#4ba3c7;
+  --blue:#0277ab;
+  --green:#7ac143;
+  --dark:#0d0d0d;
+  --g900:#1a1d23;
+  --g700:#3d4450;
+  --g500:#6b7280;
+  --font:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{
+  font-family:var(--font);
+  color:var(--g900);
+  background:linear-gradient(125deg,#f8fcfd,#eaf7fb 52%,#f0f8e9) fixed;
+  -webkit-font-smoothing:antialiased;
+  display:flex;
+  flex-direction:column;
+  min-height:100vh;
+  min-height:100dvh;
+}
+header{
+  background:linear-gradient(135deg,#0d0d0d,#1a1a1a);
+  color:#fff;
+  padding:1.1rem 1.25rem calc(1.15rem + env(safe-area-inset-top));
+  padding-top:calc(1.1rem + env(safe-area-inset-top));
+  border-bottom:3px solid var(--green);
+  text-align:center;
+}
+header img{
+  display:block;
+  height:52px;
+  width:auto;
+  margin:0 auto .75rem;
+  background:#fff;
+  padding:6px 10px;
+  border-radius:6px;
+}
+header h1{margin:0;font-size:1.35rem;font-weight:700;letter-spacing:.01em}
+header p{margin:.35rem 0 0;color:#c8d0d6;font-size:.95rem}
+main{
+  flex:1;
+  width:100%;
+  max-width:640px;
+  margin:0 auto;
+  padding:2rem 1.25rem 1.5rem;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 180px));
+  justify-content:center;
+  gap:1.6rem 1.25rem;
+  width:100%;
+}
+.tile{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-decoration:none;
+  color:inherit;
+  -webkit-tap-highlight-color:transparent;
+}
+.icon{
+  width:128px;
+  height:128px;
+  border-radius:28px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 10px 24px rgba(13,13,13,.18);
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+.tile:hover .icon{transform:translateY(-3px);box-shadow:0 14px 28px rgba(13,13,13,.22)}
+.tile:active .icon{transform:scale(.96)}
+.tile:focus-visible{outline:none}
+.tile:focus-visible .icon{outline:3px solid var(--cyan);outline-offset:4px}
+.icon svg{width:72px;height:72px;display:block;color:#fff;fill:#fff}
+.label{
+  margin-top:.85rem;
+  text-align:center;
+  font-size:1.05rem;
+  font-weight:700;
+  line-height:1.3;
+  color:var(--dark);
+  max-width:11.5rem;
+}
+footer{
+  padding:0 1.25rem calc(1.4rem + env(safe-area-inset-bottom));
+  text-align:center;
+  color:var(--g500);
+  font-size:.85rem;
+  line-height:1.45;
+  max-width:520px;
+  margin:0 auto 1rem;
+}
+@media (max-width:420px){
+  .icon{width:116px;height:116px;border-radius:26px}
+  .icon svg{width:64px;height:64px}
+}
+@media (prefers-reduced-motion:reduce){
+  .icon{transition:none}
+  .tile:hover .icon,.tile:active .icon{transform:none}
+}
+</style>
+</head>
+<body>
+<header>
+  <img src="/logo-previjob.png" width="265" height="100" alt="PREVIJOB, Servicio de Prevención" />
+  <h1>Panel PREVIJOB</h1>
+  <p>Elige una herramienta para abrirla</p>
+</header>
+<main>
+  <div class="grid" id="grid"></div>
+</main>
+<footer>
+  El panel de administración de cursos pide la contraseña de acceso. Si el servidor llevaba un rato parado, la primera carga puede tardar unos 15 segundos.
+</footer>
+<script>
+/* ── Cómo añadir una herramienta ──
+ * 1. Añade un objeto al array TOOLS (id, name, href, icon, color).
+ * 2. El campo icon debe coincidir con una clave de ICONS.
+ *    Iconos disponibles: "formacion" (birrete) y "documento".
+ * 3. Si necesitas un icono nuevo, añade su SVG en ICONS con la misma clave.
+ * 4. git add -A && git commit && git push  — Render actualiza la web solo.
+ * No incluyas contraseñas.
+ */
+const TOOLS = [
+  {
+    id: "cursos",
+    name: "Administración de cursos",
+    href: "https://curso-prl-taf-api.onrender.com/admin/",
+    icon: "formacion",
+    color: "linear-gradient(160deg,#06476b,#0277ab)"
+  },
+  {
+    id: "acta",
+    name: "Acta de visita",
+    href: "https://acta-visita.onrender.com",
+    icon: "documento",
+    color: "linear-gradient(160deg,#0d0d0d,#1f3a22)"
+  }
+];
+
+const ICONS = {
+  formacion: '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 8.5 4 22.5l28 14 24-12v14.2h4V22.5L32 8.5z"/><path d="M16 29.2v11.4c0 .6.4 1.4 1.5 2.2 2.4 1.8 7.6 4.2 14.5 4.2s12.1-2.4 14.5-4.2c1.1-.8 1.5-1.6 1.5-2.2V29.2L32 40.2 16 29.2z"/><path d="M52 26.8v18.2c2.4 1 4 3.6 4 5.5 0 2.4-2.2 3.5-4.6 3.5s-4.6-1.1-4.6-3.5c0-1.9 1.6-4.5 4-5.5V28.8l1.2-.6z"/></svg>',
+  documento: '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M14 8h22l14 14v34a6 6 0 0 1-6 6H14a6 6 0 0 1-6-6V14a6 6 0 0 1 6-6z"/><path fill="#d7dde0" d="M36 8v14h14L36 8z"/><path d="M20 34h24M20 42h24M20 50h14" fill="none" stroke="#1a1d23" stroke-width="3.2" stroke-linecap="round" opacity=".4"/></svg>'
+};
+
+const grid = document.getElementById("grid");
+for (const tool of TOOLS) {
+  const a = document.createElement("a");
+  a.className = "tile";
+  a.href = tool.href;
+  a.target = "_blank";
+  a.rel = "noopener noreferrer";
+  a.setAttribute("aria-label", "Abrir " + tool.name);
+  const icon = document.createElement("span");
+  icon.className = "icon";
+  icon.style.background = tool.color;
+  icon.innerHTML = ICONS[tool.icon] || ICONS.documento;
+  const label = document.createElement("span");
+  label.className = "label";
+  label.textContent = tool.name;
+  a.append(icon, label);
+  grid.append(a);
+}
+</script>
+</body>
+</html>
