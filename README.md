@@ -19,7 +19,7 @@ Web publicada: https://panel-previjob.onrender.com
 }
 ```
 
-3. El campo `icon` debe ser una clave de `ICONS`. Las que ya existen son `formacion` (birrete) y `documento`. Para un icono nuevo, añade su SVG en `ICONS` con la misma clave.
+3. El campo `icon` debe ser una clave de `ICONS`. Las que ya existen son `formacion` (birrete), `documento` y `bombilla`. Para un icono nuevo, añade su SVG en `ICONS` con la misma clave.
 4. Guarda, haz commit y `git push` a `main`. Render actualiza la web solo.
 
 No pongas contraseñas en este repositorio ni en la página.

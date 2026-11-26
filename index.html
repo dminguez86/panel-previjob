@@ -70,6 +70,9 @@ main{
   gap:1.6rem 1.25rem;
   width:100%;
 }
+@media (min-width:560px){
+  .grid{grid-template-columns:repeat(3, minmax(0, 180px))}
+}
 .tile{
   display:flex;
   flex-direction:column;
@@ -137,7 +140,7 @@ footer{
 /* ── Cómo añadir una herramienta ──
  * 1. Añade un objeto al array TOOLS (id, name, href, icon, color).
  * 2. El campo icon debe coincidir con una clave de ICONS.
- *    Iconos disponibles: "formacion" (birrete) y "documento".
+ *    Iconos disponibles: "formacion" (birrete), "documento" y "bombilla".
  * 3. Si necesitas un icono nuevo, añade su SVG en ICONS con la misma clave.
  * 4. git add -A && git commit && git push  — Render actualiza la web solo.
  * No incluyas contraseñas.
@@ -156,12 +159,20 @@ const TOOLS = [
     href: "https://acta-visita.onrender.com",
     icon: "documento",
     color: "linear-gradient(160deg,#0d0d0d,#1f3a22)"
+  },
+  {
+    id: "luxometria",
+    name: "Luxometría",
+    href: "https://previjob-luxometria.d-rodriguez.chatgpt.site/",
+    icon: "bombilla",
+    color: "linear-gradient(160deg,#b45309,#f5c542)"
   }
 ];
 
 const ICONS = {
   formacion: '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 8.5 4 22.5l28 14 24-12v14.2h4V22.5L32 8.5z"/><path d="M16 29.2v11.4c0 .6.4 1.4 1.5 2.2 2.4 1.8 7.6 4.2 14.5 4.2s12.1-2.4 14.5-4.2c1.1-.8 1.5-1.6 1.5-2.2V29.2L32 40.2 16 29.2z"/><path d="M52 26.8v18.2c2.4 1 4 3.6 4 5.5 0 2.4-2.2 3.5-4.6 3.5s-4.6-1.1-4.6-3.5c0-1.9 1.6-4.5 4-5.5V28.8l1.2-.6z"/></svg>',
-  documento: '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M14 8h22l14 14v34a6 6 0 0 1-6 6H14a6 6 0 0 1-6-6V14a6 6 0 0 1 6-6z"/><path fill="#d7dde0" d="M36 8v14h14L36 8z"/><path d="M20 34h24M20 42h24M20 50h14" fill="none" stroke="#1a1d23" stroke-width="3.2" stroke-linecap="round" opacity=".4"/></svg>'
+  documento: '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M14 8h22l14 14v34a6 6 0 0 1-6 6H14a6 6 0 0 1-6-6V14a6 6 0 0 1 6-6z"/><path fill="#d7dde0" d="M36 8v14h14L36 8z"/><path d="M20 34h24M20 42h24M20 50h14" fill="none" stroke="#1a1d23" stroke-width="3.2" stroke-linecap="round" opacity=".4"/></svg>',
+  bombilla: '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4c-10.5 0-19 8.4-19 18.7 0 6.8 3.7 12.8 9.2 16.1V43h19.6v-4.2c5.5-3.3 9.2-9.3 9.2-16.1C51 12.4 42.5 4 32 4z"/><path d="M28 28.5c0-2.6 1.9-4.6 4-4.6s4 2 4 4.6" fill="none" stroke="#8a3d08" stroke-width="2.4" stroke-linecap="round"/><path d="M26.5 34.2c3.5-3.2 7.5-3.2 11 0" fill="none" stroke="#8a3d08" stroke-width="2.4" stroke-linecap="round"/><path d="M32 24v6.5" fill="none" stroke="#8a3d08" stroke-width="2.4" stroke-linecap="round"/><rect x="23.2" y="43" width="17.6" height="3.3" rx="1"/><rect x="23.2" y="47.2" width="17.6" height="3.3" rx="1"/><path d="M25.6 51.4h12.8l-1.7 5.4H27.3z"/></svg>'
 };
 
 const grid = document.getElementById("grid");
